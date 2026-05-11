@@ -1,5 +1,5 @@
 #include "chunk.h"
-#include "cmark-gfm.h"
+#include "cmark.h"
 
 #ifdef __cplusplus
 extern "C" {

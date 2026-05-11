@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "config.h"
-#include "cmark-gfm.h"
+#include "cmark.h"
 #include "node.h"
 #include "buffer.h"
 #include "houdini.h"

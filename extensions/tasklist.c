@@ -18,7 +18,7 @@ static const char *get_type_string(cmark_syntax_extension *extension, cmark_node
 
 
 // Return 1 if state was set, 0 otherwise
-int cmark_gfm_extensions_set_tasklist_item_checked(cmark_node *node, bool is_checked) {
+int cmark_extensions_set_tasklist_item_checked(cmark_node *node, bool is_checked) {
   // The node has to exist, and be an extension, and actually be the right type in order to get the value.
   if (!node || !node->extension || strcmp(cmark_node_get_type_string(node), TYPE_STRING))
     return 0;
@@ -27,7 +27,7 @@ int cmark_gfm_extensions_set_tasklist_item_checked(cmark_node *node, bool is_che
   return 1;
 }
 
-bool cmark_gfm_extensions_get_tasklist_item_checked(cmark_node *node) {
+bool cmark_extensions_get_tasklist_item_checked(cmark_node *node) {
   if (!node || !node->extension || strcmp(cmark_node_get_type_string(node), TYPE_STRING))
     return false;
 

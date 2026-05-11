@@ -8,8 +8,8 @@ extern "C" {
 #include <stdio.h>
 #include <stdint.h>
 
-#include "cmark-gfm.h"
-#include "cmark-gfm-extension_api.h"
+#include "cmark.h"
+#include "cmark_extension_api.h"
 #include "buffer.h"
 #include "chunk.h"
 
@@ -116,24 +116,24 @@ struct cmark_node {
  * struct. The `flags` parameter should be the address of a global variable
  * which will store the flag value.
  */
-CMARK_GFM_EXPORT
+CMARK_EXPORT
 void cmark_register_node_flag(cmark_node_internal_flags *flags);
 
 /**
  * DEPRECATED.
  *
- * This function was added in cmark-gfm version 0.29.0.gfm.7, and was
+ * This function was added in cmark version 0.29.0.gfm.7, and was
  * required to be called at program start time, which caused
- * backwards-compatibility issues in applications that use cmark-gfm as a
+ * backwards-compatibility issues in applications that use cmark as a
  * library. It is now a no-op.
  */
-CMARK_GFM_EXPORT
+CMARK_EXPORT
 void cmark_init_standard_node_flags(void);
 
 static CMARK_INLINE cmark_mem *cmark_node_mem(cmark_node *node) {
   return node->content.mem;
 }
-CMARK_GFM_EXPORT int cmark_node_check(cmark_node *node, FILE *out);
+CMARK_EXPORT int cmark_node_check(cmark_node *node, FILE *out);
 
 static CMARK_INLINE bool CMARK_NODE_TYPE_BLOCK_P(cmark_node_type node_type) {
 	return (node_type & CMARK_NODE_TYPE_MASK) == CMARK_NODE_TYPE_BLOCK;
@@ -151,14 +151,14 @@ static CMARK_INLINE bool CMARK_NODE_INLINE_P(cmark_node *node) {
 	return node != NULL && CMARK_NODE_TYPE_INLINE_P((cmark_node_type) node->type);
 }
 
-CMARK_GFM_EXPORT bool cmark_node_can_contain_type(cmark_node *node, cmark_node_type child_type);
+CMARK_EXPORT bool cmark_node_can_contain_type(cmark_node *node, cmark_node_type child_type);
 
 /**
  * Enable (or disable) extra safety checks. These extra checks cause
  * extra performance overhead (in some cases quadratic), so they are only
  * intended to be used during testing.
  */
-CMARK_GFM_EXPORT void cmark_enable_safety_checks(bool enable);
+CMARK_EXPORT void cmark_enable_safety_checks(bool enable);
 
 #ifdef __cplusplus
 }

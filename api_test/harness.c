@@ -6,7 +6,7 @@
 
 #include "harness.h"
 
-test_batch_runner *test_batch_runner_new(void) {
+test_batch_runner *test_batch_runner_new() {
   return (test_batch_runner *)calloc(1, sizeof(test_batch_runner));
 }
 

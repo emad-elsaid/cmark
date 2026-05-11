@@ -12,7 +12,7 @@ def pipe_through_prog(prog, text):
     return [p1.returncode, result.decode('utf-8'), err]
 
 def parse(lib, extlib, text, extensions):
-    cmark_gfm_core_extensions_ensure_registered = extlib.cmark_gfm_core_extensions_ensure_registered
+    cmark_core_extensions_ensure_registered = extlib.cmark_core_extensions_ensure_registered
 
     find_syntax_extension = lib.cmark_find_syntax_extension
     find_syntax_extension.restype = c_void_p
@@ -32,7 +32,7 @@ def parse(lib, extlib, text, extensions):
     parser_finish.restype = c_void_p
     parser_finish.argtypes = [c_void_p]
 
-    cmark_gfm_core_extensions_ensure_registered()
+    cmark_core_extensions_ensure_registered()
 
     parser = parser_new(0)
     for e in set(extensions):
@@ -93,13 +93,13 @@ class CMark:
             if not library_dir:
                 library_dir = os.path.join("..", "build", "src")
             for prefix, suffix in libnames:
-                candidate = os.path.join(library_dir, prefix + "cmark-gfm" + suffix)
+                candidate = os.path.join(library_dir, prefix + "cmark" + suffix)
                 if os.path.isfile(candidate):
                     libpath = candidate
                     break
             cmark = CDLL(libpath)
             extlib = CDLL(os.path.join(
-                library_dir, "..", "extensions", prefix + "cmark-gfm-extensions" + suffix))
+                library_dir, "..", "extensions", prefix + "cmark-extensions" + suffix))
             self.to_html = lambda x, exts=[]: to_html(cmark, extlib, x, exts + self.extensions)
             self.to_commonmark = lambda x, exts=[]: to_commonmark(cmark, extlib, x, exts + self.extensions)
 

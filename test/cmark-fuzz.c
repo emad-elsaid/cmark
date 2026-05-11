@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "cmark-gfm.h"
-#include "cmark-gfm-core-extensions.h"
+#include "cmark.h"
+#include "cmark-extensions.h"
 
 const char *extension_names[] = {
   "autolink",
@@ -13,7 +13,7 @@ const char *extension_names[] = {
 };
 
 int LLVMFuzzerInitialize(int *argc, char ***argv) {
-  cmark_gfm_core_extensions_ensure_registered();
+  cmark_core_extensions_ensure_registered();
   return 0;
 }
 

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "buffer.h"
 #include "chunk.h"
-#include "cmark-gfm.h"
+#include "cmark.h"
 #include "utf8.h"
 #include "render.h"
 #include "node.h"

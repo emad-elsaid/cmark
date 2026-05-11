@@ -12,9 +12,9 @@ macro(fuzzer name)
           COMPILE_FLAGS "-fsanitize=fuzzer"
           LINK_FLAGS "-fsanitize=fuzzer")
     if(CMARK_SHARED)
-      target_link_libraries(${name} libcmark-gfm-extensions libcmark-gfm)
+      target_link_libraries(${name} libcmark-extensions libcmark)
     elseif(CMARK_STATIC)
-      target_link_libraries(${name} libcmark-gfm-extensions_static libcmark-gfm_static)
+      target_link_libraries(${name} libcmark-extensions_static libcmark_static)
     endif()
 endmacro()
 

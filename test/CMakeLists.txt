@@ -57,11 +57,11 @@ IF (PYTHONINTERP_FOUND)
   endif()
 
   add_test(spectest_executable
-    ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/spec_tests.py" "--no-normalize" "--spec" "${CMAKE_CURRENT_SOURCE_DIR}/spec.txt" "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark-gfm"
+    ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/spec_tests.py" "--no-normalize" "--spec" "${CMAKE_CURRENT_SOURCE_DIR}/spec.txt" "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark"
     )
 
   add_test(smartpuncttest_executable
-    ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/spec_tests.py" "--no-normalize" "--spec" "${CMAKE_CURRENT_SOURCE_DIR}/smart_punct.txt" "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark-gfm --smart"
+    ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/spec_tests.py" "--no-normalize" "--spec" "${CMAKE_CURRENT_SOURCE_DIR}/smart_punct.txt" "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark --smart"
     )
 
   add_test(extensions_executable
@@ -69,7 +69,7 @@ IF (PYTHONINTERP_FOUND)
     "${CMAKE_CURRENT_SOURCE_DIR}/spec_tests.py"
     "--no-normalize"
     "--spec" "${CMAKE_CURRENT_SOURCE_DIR}/extensions.txt"
-    "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark-gfm"
+    "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark"
     "--extensions" "table strikethrough autolink tagfilter footnotes tasklist"
     )
 
@@ -77,7 +77,7 @@ IF (PYTHONINTERP_FOUND)
     ${PYTHON_EXECUTABLE}
     "${CMAKE_CURRENT_SOURCE_DIR}/roundtrip_tests.py"
     "--spec" "${CMAKE_CURRENT_SOURCE_DIR}/extensions.txt"
-    "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark-gfm"
+    "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark"
     "--extensions" "table strikethrough autolink tagfilter footnotes tasklist"
     )
 
@@ -85,7 +85,7 @@ IF (PYTHONINTERP_FOUND)
     ${PYTHON_EXECUTABLE}
     "${CMAKE_CURRENT_SOURCE_DIR}/roundtrip_tests.py"
     "--spec" "${CMAKE_CURRENT_SOURCE_DIR}/extensions-table-prefer-style-attributes.txt"
-    "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark-gfm --table-prefer-style-attributes"
+    "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark --table-prefer-style-attributes"
     "--extensions" "table strikethrough autolink tagfilter footnotes tasklist"
     )
 
@@ -93,14 +93,14 @@ IF (PYTHONINTERP_FOUND)
     ${PYTHON_EXECUTABLE}
     "${CMAKE_CURRENT_SOURCE_DIR}/roundtrip_tests.py"
     "--spec" "${CMAKE_CURRENT_SOURCE_DIR}/extensions-full-info-string.txt"
-    "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark-gfm --full-info-string"
+    "--program" "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark --full-info-string"
     )
 
   add_test(regressiontest_executable
     ${PYTHON_EXECUTABLE}
     "${CMAKE_CURRENT_SOURCE_DIR}/spec_tests.py" "--no-normalize" "--spec"
     "${CMAKE_CURRENT_SOURCE_DIR}/regression.txt" "--program"
-    "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark-gfm"
+    "${CMAKE_CURRENT_BINARY_DIR}/../src/cmark"
     )
 
 

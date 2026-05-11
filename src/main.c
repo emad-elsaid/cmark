@@ -3,14 +3,14 @@
 #include <string.h>
 #include <errno.h>
 #include "config.h"
-#include "cmark-gfm.h"
+#include "cmark.h"
 #include "node.h"
-#include "cmark-gfm-extension_api.h"
+#include "cmark_extension_api.h"
 #include "syntax_extension.h"
 #include "parser.h"
 #include "registry.h"
 
-#include "../extensions/cmark-gfm-core-extensions.h"
+#include "../extensions/cmark-extensions.h"
 
 #if defined(__OpenBSD__)
 #  include <sys/param.h>
@@ -44,7 +44,7 @@ typedef enum {
 } writer_format;
 
 void print_usage() {
-  printf("Usage:   cmark-gfm [FILE*]\n");
+  printf("Usage:   cmark [FILE*]\n");
   printf("Options:\n");
   printf("  --to, -t FORMAT   Specify output format (html, xml, man, "
          "commonmark, plaintext, latex)\n");
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
-  cmark_gfm_core_extensions_ensure_registered();
+  cmark_core_extensions_ensure_registered();
 
 #ifdef USE_PLEDGE
   if (pledge("stdio rpath", NULL) != 0) {
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
 
   for (i = 1; i < argc; i++) {
     if (strcmp(argv[i], "--version") == 0) {
-      printf("cmark-gfm %s", CMARK_GFM_VERSION_STRING);
+      printf("cmark %s", CMARK_VERSION_STRING);
       printf(" - CommonMark with GitHub Flavored Markdown converter\n(C) 2014-2016 John MacFarlane\n");
       goto success;
     } else if (strcmp(argv[i], "--list-extensions") == 0) {

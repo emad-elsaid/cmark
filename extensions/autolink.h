@@ -1,7 +1,7 @@
-#ifndef CMARK_GFM_AUTOLINK_H
-#define CMARK_GFM_AUTOLINK_H
+#ifndef CMARK_AUTOLINK_H
+#define CMARK_AUTOLINK_H
 
-#include "cmark-gfm-core-extensions.h"
+#include "cmark-extensions.h"
 
 cmark_syntax_extension *create_autolink_extension(void);
 

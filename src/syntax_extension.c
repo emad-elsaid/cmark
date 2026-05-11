@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "cmark-gfm.h"
+#include "cmark.h"
 #include "syntax_extension.h"
 #include "buffer.h"
 

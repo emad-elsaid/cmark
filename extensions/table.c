@@ -1,4 +1,4 @@
-#include <cmark-gfm-extension_api.h>
+#include <cmark_extension_api.h>
 #include <html.h>
 #include <inlines.h>
 #include <parser.h>
@@ -9,7 +9,7 @@
 #include "ext_scanners.h"
 #include "strikethrough.h"
 #include "table.h"
-#include "cmark-gfm-core-extensions.h"
+#include "cmark-extensions.h"
 
 // Limit to prevent a malicious input from causing a denial of service.
 #define MAX_AUTOCOMPLETED_CELLS 0x80000
@@ -659,7 +659,7 @@ static void latex_render(cmark_syntax_extension *extension,
 static const char *xml_attr(cmark_syntax_extension *extension,
                             cmark_node *node) {
   if (node->type == CMARK_NODE_TABLE_CELL) {
-    if (cmark_gfm_extensions_get_table_row_is_header(node->parent)) {
+    if (cmark_extensions_get_table_row_is_header(node->parent)) {
       switch (get_cell_alignment(node)) {
       case 'l': return " align=\"left\"";
       case 'c': return " align=\"center\"";
@@ -875,31 +875,31 @@ cmark_syntax_extension *create_table_extension(void) {
   return self;
 }
 
-uint16_t cmark_gfm_extensions_get_table_columns(cmark_node *node) {
+uint16_t cmark_extensions_get_table_columns(cmark_node *node) {
   if (node->type != CMARK_NODE_TABLE)
     return 0;
 
   return ((node_table *)node->as.opaque)->n_columns;
 }
 
-uint8_t *cmark_gfm_extensions_get_table_alignments(cmark_node *node) {
+uint8_t *cmark_extensions_get_table_alignments(cmark_node *node) {
   if (node->type != CMARK_NODE_TABLE)
     return 0;
 
   return ((node_table *)node->as.opaque)->alignments;
 }
 
-int cmark_gfm_extensions_set_table_columns(cmark_node *node, uint16_t n_columns) {
+int cmark_extensions_set_table_columns(cmark_node *node, uint16_t n_columns) {
   return set_n_table_columns(node, n_columns);
 }
 
-int cmark_gfm_extensions_set_table_alignments(cmark_node *node, uint16_t ncols, uint8_t *alignments) {
+int cmark_extensions_set_table_alignments(cmark_node *node, uint16_t ncols, uint8_t *alignments) {
   uint8_t *a = (uint8_t *)cmark_node_mem(node)->calloc(1, ncols);
   memcpy(a, alignments, ncols);
   return set_table_alignments(node, a);
 }
 
-int cmark_gfm_extensions_get_table_row_is_header(cmark_node *node)
+int cmark_extensions_get_table_row_is_header(cmark_node *node)
 {
   if (!node || node->type != CMARK_NODE_TABLE_ROW)
     return 0;
@@ -907,7 +907,7 @@ int cmark_gfm_extensions_get_table_row_is_header(cmark_node *node)
   return ((node_table_row *)node->as.opaque)->is_header;
 }
 
-int cmark_gfm_extensions_set_table_row_is_header(cmark_node *node, int is_header)
+int cmark_extensions_set_table_row_is_header(cmark_node *node, int is_header)
 {
   if (!node || node->type != CMARK_NODE_TABLE_ROW)
     return 0;

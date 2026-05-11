@@ -1,4 +1,4 @@
-#include "cmark-gfm.h"
+#include "cmark.h"
 #include "parser.h"
 #include "references.h"
 #include "inlines.h"

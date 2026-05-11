@@ -1,7 +1,7 @@
-#ifndef CMARK_GFM_TABLE_H
-#define CMARK_GFM_TABLE_H
+#ifndef CMARK_TABLE_H
+#define CMARK_TABLE_H
 
-#include "cmark-gfm-core-extensions.h"
+#include "cmark-extensions.h"
 
 
 extern cmark_node_type CMARK_NODE_TABLE, CMARK_NODE_TABLE_ROW,

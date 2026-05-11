@@ -3,7 +3,7 @@
 #
 # Example for using the shared library from python.
 # Will work with either python 2 or python 3.
-# Requires cmark-gfm and cmark-gfm-extensions libraries to be installed.
+# Requires cmark and cmark-extensions libraries to be installed.
 #
 # This particular example uses the GitHub extensions from the gfm-extensions
 # library. EXTENSIONS specifies which to use, and the sample shows how to
@@ -14,14 +14,14 @@ import sys
 import ctypes
 
 if sys.platform == 'darwin':
-    libname = 'libcmark-gfm.dylib'
-    extname = 'libcmark-gfm-extensions.dylib'
+    libname = 'libcmark.dylib'
+    extname = 'libcmark-extensions.dylib'
 elif sys.platform == 'win32':
-    libname = 'cmark-gfm.dll'
-    extname = 'cmark-gfm-extensions.dll'
+    libname = 'cmark.dll'
+    extname = 'cmark-extensions.dll'
 else:
-    libname = 'libcmark-gfm.so'
-    extname = 'libcmark-gfm-extensions.so'
+    libname = 'libcmark.so'
+    extname = 'libcmark-extensions.so'
 cmark = ctypes.CDLL(libname)
 cmark_ext = ctypes.CDLL(extname)
 
@@ -36,7 +36,7 @@ EXTENSIONS = (
   'tagfilter',
   )
 
-# Use ctypes to access the functions in libcmark-gfm
+# Use ctypes to access the functions in libcmark
 
 F_cmark_parser_new = cmark.cmark_parser_new
 F_cmark_parser_new.restype = ctypes.c_void_p
@@ -75,15 +75,15 @@ F_cmark_render_html.restype = ctypes.c_char_p
 F_cmark_render_html.argtypes = (ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p)
 
 
-# Set up the libcmark-gfm library and its extensions
-F_register = cmark_ext.cmark_gfm_core_extensions_ensure_registered
+# Set up the libcmark library and its extensions
+F_register = cmark_ext.cmark_core_extensions_ensure_registered
 F_register.restype = None
 F_register.argtypes = ( )
 F_register()
 
 
 def md2html(text):
-  "Use cmark-gfm to render the Markdown into an HTML fragment."
+  "Use cmark to render the Markdown into an HTML fragment."
 
   parser = F_cmark_parser_new(OPTS)
   assert parser
