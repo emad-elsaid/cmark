@@ -1,24 +1,26 @@
-#include <assert.h>
-#include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
-#include "cmark.h"
+#include "config.h"
+#include "cmark-gfm.h"
 #include "node.h"
 #include "buffer.h"
 #include "utf8.h"
 #include "scanners.h"
 #include "render.h"
+#include "syntax_extension.h"
 
-#define OUT(s, wrap, escaping) renderer->out(renderer, s, wrap, escaping)
-#define LIT(s) renderer->out(renderer, s, false, LITERAL)
+#define OUT(s, wrap, escaping) renderer->out(renderer, node, s, wrap, escaping)
+#define LIT(s) renderer->out(renderer, node, s, false, LITERAL)
 #define CR() renderer->cr(renderer)
 #define BLANKLINE() renderer->blankline(renderer)
 #define LIST_NUMBER_STRING_SIZE 20
 
-static inline void outc(cmark_renderer *renderer, cmark_escaping escape,
-                        int32_t c, unsigned char nextc) {
+static CMARK_INLINE void outc(cmark_renderer *renderer, cmark_node *node,
+                              cmark_escaping escape,
+                              int32_t c, unsigned char nextc) {
   if (escape == LITERAL) {
     cmark_render_code_point(renderer, c);
     return;
@@ -190,9 +192,9 @@ static link_type get_link_type(cmark_node *node) {
       realurllen -= 7;
       isemail = true;
     }
-    if (realurllen == link_text->len &&
-        strncmp(realurl, (char *)link_text->data,
-                link_text->len) == 0) {
+    if (realurllen == link_text->as.literal.len &&
+        strncmp(realurl, (char *)link_text->as.literal.data,
+                link_text->as.literal.len) == 0) {
       if (isemail) {
         return EMAIL_AUTOLINK;
       } else {
@@ -226,8 +228,10 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
   cmark_list_type list_type;
   bool allow_wrap = renderer->width > 0 && !(CMARK_OPT_NOBREAKS & options);
 
-  // avoid warning about unused parameter:
-  (void)(options);
+  if (node->extension && node->extension->latex_render_func) {
+    node->extension->latex_render_func(node->extension, renderer, node, ev_type, options);
+    return 1;
+  }
 
   switch (node->type) {
   case CMARK_NODE_DOCUMENT:
@@ -256,7 +260,7 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
         // latex normally supports only five levels
         if (enumlevel >= 1 && enumlevel <= 5) {
           snprintf(list_number_string, LIST_NUMBER_STRING_SIZE, "%d",
-                   list_number - 1); // the next item will increment this
+                   list_number);
           LIT("\\setcounter{enum");
           switch (enumlevel) {
           case 1: LIT("i"); break;
@@ -265,7 +269,7 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
           case 4: LIT("iv"); break;
           case 5: LIT("v"); break;
           default: LIT("i"); break;
-          }
+	  }
           LIT("}{");
           OUT(list_number_string, false, NORMAL);
           LIT("}");
@@ -381,10 +385,12 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
     break;
 
   case CMARK_NODE_STRONG:
-    if (entering) {
-      LIT("\\textbf{");
-    } else {
-      LIT("}");
+    if (node->parent == NULL || node->parent->type != CMARK_NODE_STRONG) {
+      if (entering) {
+        LIT("\\textbf{");
+      } else {
+        LIT("}");
+      }
     }
     break;
 
@@ -409,7 +415,7 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
       case EMAIL_AUTOLINK:
         LIT("\\href{");
         OUT(url, false, URL);
-        LIT("}{\\nolinkurl{");
+        LIT("}\\nolinkurl{");
         break;
       case NORMAL_LINK:
         LIT("\\href{");
@@ -425,9 +431,6 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
         LIT("{"); // error?
       }
     } else {
-      if (get_link_type(node) == EMAIL_AUTOLINK) {
-        LIT("}"); // Close up \nolinkurl argument
-      }
       LIT("}");
     }
 
@@ -443,6 +446,11 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
     }
     break;
 
+  case CMARK_NODE_FOOTNOTE_DEFINITION:
+  case CMARK_NODE_FOOTNOTE_REFERENCE:
+    // TODO
+    break;
+
   default:
     assert(false);
     break;
@@ -452,5 +460,9 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
 }
 
 char *cmark_render_latex(cmark_node *root, int options, int width) {
-  return cmark_render(root, options, width, outc, S_render_node);
+  return cmark_render_latex_with_mem(root, options, width, cmark_node_mem(root));
+}
+
+char *cmark_render_latex_with_mem(cmark_node *root, int options, int width, cmark_mem *mem) {
+  return cmark_render(mem, root, options, width, outc, S_render_node);
 }

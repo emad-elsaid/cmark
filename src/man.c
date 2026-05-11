@@ -1,23 +1,25 @@
-#include <assert.h>
-#include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
-#include "cmark.h"
+#include "config.h"
+#include "cmark-gfm.h"
 #include "node.h"
 #include "buffer.h"
 #include "utf8.h"
 #include "render.h"
+#include "syntax_extension.h"
 
-#define OUT(s, wrap, escaping) renderer->out(renderer, s, wrap, escaping)
-#define LIT(s) renderer->out(renderer, s, false, LITERAL)
+#define OUT(s, wrap, escaping) renderer->out(renderer, node, s, wrap, escaping)
+#define LIT(s) renderer->out(renderer, node, s, false, LITERAL)
 #define CR() renderer->cr(renderer)
 #define BLANKLINE() renderer->blankline(renderer)
 #define LIST_NUMBER_SIZE 20
 
 // Functions to convert cmark_nodes to groff man strings.
-static void S_outc(cmark_renderer *renderer, cmark_escaping escape, int32_t c,
+static void S_outc(cmark_renderer *renderer, cmark_node *node, 
+                   cmark_escaping escape, int32_t c,
                    unsigned char nextc) {
   (void)(nextc);
 
@@ -72,31 +74,30 @@ static void S_outc(cmark_renderer *renderer, cmark_escaping escape, int32_t c,
 
 static int S_render_node(cmark_renderer *renderer, cmark_node *node,
                          cmark_event_type ev_type, int options) {
-  cmark_node *tmp;
   int list_number;
   bool entering = (ev_type == CMARK_EVENT_ENTER);
   bool allow_wrap = renderer->width > 0 && !(CMARK_OPT_NOBREAKS & options);
-  struct block_number *new_block_number;
-  cmark_mem *allocator = cmark_get_default_mem_allocator();
 
-  // avoid unused parameter error:
-  (void)(options);
-
-  // indent inside nested lists
-  if (renderer->block_number_in_list_item &&
-      node->type < CMARK_NODE_FIRST_INLINE) {
-    if (entering) {
-      renderer->block_number_in_list_item->number += 1;
-      if (renderer->block_number_in_list_item->number == 2) {
-        CR();
-        LIT(".RS"); // indent
-        CR();
-      }
-    }
+  if (node->extension && node->extension->man_render_func) {
+    node->extension->man_render_func(node->extension, renderer, node, ev_type, options);
+    return 1;
   }
 
   switch (node->type) {
   case CMARK_NODE_DOCUMENT:
+    if (entering) {
+      /* Define a strikethrough macro */
+      /* Commenting out because this makes tests fail
+      LIT(".de ST");
+      CR();
+      LIT(".nr ww \\w'\\\\$1'");
+      CR();
+      LIT("\\Z@\\v'-.25m'\\l'\\\\n[ww]u'@\\\\$1");
+      CR();
+      LIT("..");
+      CR();
+      */
+    }
     break;
 
   case CMARK_NODE_BLOCK_QUOTE:
@@ -116,37 +117,18 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
 
   case CMARK_NODE_ITEM:
     if (entering) {
-      new_block_number = allocator->calloc(1, sizeof(struct block_number));
-      new_block_number->number = 0;
-      new_block_number->parent = renderer->block_number_in_list_item;
-      renderer->block_number_in_list_item = new_block_number;
       CR();
       LIT(".IP ");
       if (cmark_node_get_list_type(node->parent) == CMARK_BULLET_LIST) {
         LIT("\\[bu] 2");
       } else {
-        list_number = cmark_node_get_list_start(node->parent);
-        tmp = node;
-        while (tmp->prev) {
-          tmp = tmp->prev;
-          list_number += 1;
-        }
+        list_number = cmark_node_get_item_index(node);
         char list_number_s[LIST_NUMBER_SIZE];
         snprintf(list_number_s, LIST_NUMBER_SIZE, "\"%d.\" 4", list_number);
         LIT(list_number_s);
       }
       CR();
     } else {
-      if (renderer->block_number_in_list_item) {
-        if (renderer->block_number_in_list_item->number >= 2) {
-          CR();
-          LIT(".RE"); // de-indent
-        }
-        new_block_number = renderer->block_number_in_list_item;
-        renderer->block_number_in_list_item =
-          renderer->block_number_in_list_item->parent;
-        allocator->free(new_block_number);
-      }
       CR();
     }
     break;
@@ -237,10 +219,12 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
     break;
 
   case CMARK_NODE_STRONG:
-    if (entering) {
-      LIT("\\f[B]");
-    } else {
-      LIT("\\f[]");
+    if (node->parent == NULL || node->parent->type != CMARK_NODE_STRONG) {
+      if (entering) {
+        LIT("\\f[B]");
+      } else {
+        LIT("\\f[]");
+      }
     }
     break;
 
@@ -268,6 +252,11 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
     }
     break;
 
+  case CMARK_NODE_FOOTNOTE_DEFINITION:
+  case CMARK_NODE_FOOTNOTE_REFERENCE:
+    // TODO
+    break;
+
   default:
     assert(false);
     break;
@@ -277,5 +266,9 @@ static int S_render_node(cmark_renderer *renderer, cmark_node *node,
 }
 
 char *cmark_render_man(cmark_node *root, int options, int width) {
-  return cmark_render(root, options, width, S_outc, S_render_node);
+  return cmark_render_man_with_mem(root, options, width, cmark_node_mem(root));
+}
+
+char *cmark_render_man_with_mem(cmark_node *root, int options, int width, cmark_mem *mem) {
+  return cmark_render(mem, root, options, width, S_outc, S_render_node);
 }
