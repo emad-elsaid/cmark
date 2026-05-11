@@ -1,23 +1,26 @@
-name: CIFuzz
-on: [pull_request]
+name: Fuzz
+on: [pull_request, push]
 jobs:
   Fuzzing:
     runs-on: ubuntu-latest
     steps:
-    - name: Build Fuzzers
-      uses: google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master
-      with:
-        oss-fuzz-project-name: 'cmark'
-        dry-run: false
-    - name: Run Fuzzers
-      uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
-      with:
-        oss-fuzz-project-name: 'cmark'
-        fuzz-seconds: 600
-        dry-run: false
-    - name: Upload Crash
-      uses: actions/upload-artifact@v7
+    - uses: actions/checkout@v4
+    - name: Install clang
+      run: sudo apt-get update && sudo apt-get install -y clang cmake
+    - name: Configure
+      run: cmake -S . -B build -DCMARK_FUZZ_QUADRATIC=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+    - name: Build
+      run: cmake --build build -j2
+    - name: Run fuzz_quadratic (60s)
+      run: ./build/fuzz/fuzz_quadratic -max_total_time=60
+    - name: Run fuzz_quadratic_brackets (60s)
+      run: ./build/fuzz/fuzz_quadratic_brackets -max_total_time=60
+    - name: Upload crash artifacts
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
-        name: artifacts
-        path: ./out/artifacts
+        name: fuzz-crashes
+        path: |
+          crash-*
+          leak-*
+          timeout-*
