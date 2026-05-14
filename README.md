@@ -1,13 +1,18 @@
-cmark
-=====
+cmark-gfm
+=========
 
-[![CI
-tests](https://github.com/commonmark/cmark/workflows/CI%20tests/badge.svg)](https://github.com/commonmark/cmark/actions)
+![Actions CI](https://github.com/github/cmark-gfm/actions/workflows/ci.yml/badge.svg)
 
-`cmark` is the C reference implementation of [CommonMark], a
-rationalized version of Markdown syntax with a [spec][the spec].
-(For the JavaScript reference implementation, see
-[commonmark.js].)
+`cmark-gfm` is an extended version of the C reference implementation of
+[CommonMark], a rationalized version of Markdown syntax with a spec.  This
+repository adds GitHub Flavored Markdown extensions to
+[the upstream implementation], as defined in [the spec].
+
+The rest of the README is preserved as-is from the upstream source.  Note that
+the library and binaries produced by this fork are suffixed with `-gfm` in
+order to distinguish them from the upstream.
+
+---
 
 It provides a shared library (`libcmark`) with functions for parsing
 CommonMark documents to an abstract syntax tree (AST), manipulating
@@ -58,10 +63,11 @@ There are also libraries that wrap `libcmark` for
 [Ruby](https://github.com/gjtorikian/commonmarker),
 [Lua](https://github.com/jgm/cmark-lua),
 [Perl](https://metacpan.org/release/CommonMark),
-[Python](https://pypi.org/project/umarkdown/),
+[Python](https://pypi.python.org/pypi/paka.cmark),
 [R](https://cran.r-project.org/package=commonmark),
+[Tcl](https://github.com/apnadkarni/tcl-cmark),
 [Scala](https://github.com/sparsetech/cmark-scala) and
-[PHP](https://www.php.net/manual/en/book.cmark.php).
+[Node.js](https://github.com/killa123/node-cmark).
 
 Installing
 ----------
@@ -84,15 +90,19 @@ For a more portable method, you can use [cmake] manually. [cmake] knows
 how to create build environments for many build systems.  For example,
 on FreeBSD:
 
-    cmake -S . -B build  # optionally: -DCMAKE_INSTALL_PREFIX=path
-    cmake --build build  # executable will be created as build/src/cmark
-    ctest --test-dir build
-    cmake --install build
+    mkdir build
+    cd build
+    cmake ..  # optionally: -DCMAKE_INSTALL_PREFIX=path
+    make      # executable will be created as build/src/cmark
+    make test
+    make install
 
 Or, to create Xcode project files on OSX:
 
-    cmake -S . -B build -G Xcode
-    open build/cmark.xcodeproj
+    mkdir build
+    cd build
+    cmake -G Xcode ..
+    open cmark.xcodeproj
 
 The GNU Makefile also provides a few other targets for developers.
 To run a benchmark:
@@ -119,9 +129,12 @@ To do a more systematic fuzz test with [american fuzzy lop]:
 
     AFL_PATH=/path/to/afl_directory make afl
 
-Fuzzing with [libFuzzer] is also supported. The fuzzer can be run with:
+Fuzzing with [libFuzzer] is also supported but, because libFuzzer is still
+under active development, may not work with your system-installed version of
+clang. Assuming LLVM has been built in `$HOME/src/llvm/build` the fuzzer can be
+run with:
 
-    make libFuzzer
+    CC="$HOME/src/llvm/build/bin/clang" LIB_FUZZER_PATH="$HOME/src/llvm/lib/Fuzzer/libFuzzer.a" make libFuzzer
 
 To make a release tarball and zip archive:
 
@@ -132,7 +145,7 @@ Installing (Windows)
 
 To compile with MSVC and NMAKE:
 
-    nmake /f Makefile.nmake
+    nmake
 
 You can cross-compile a Windows binary and dll on linux if you have the
 `mingw32` compiler:
@@ -181,10 +194,13 @@ Nick Wellnhofer contributed many improvements, including
 most of the C library's API and its test harness.
 
 [benchmarks]: benchmarks.md
-[the spec]: http://spec.commonmark.org
+[the spec]: https://github.github.com/gfm/
+[the upstream implementation]: https://github.com/jgm/cmark
 [CommonMark]: http://commonmark.org
 [cmake]: http://www.cmake.org/download/
 [re2c]: http://re2c.org
 [commonmark.js]: https://github.com/commonmark/commonmark.js
+[Build Status]: https://img.shields.io/travis/github/cmark-gfm/master.svg?style=flat
+[Windows Build Status]: https://ci.appveyor.com/api/projects/status/wv7ifhqhv5itm3d5?svg=true
 [american fuzzy lop]: http://lcamtuf.coredump.cx/afl/
 [libFuzzer]: http://llvm.org/docs/LibFuzzer.html

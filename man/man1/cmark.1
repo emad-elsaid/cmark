@@ -1,14 +1,14 @@
-.TH "cmark" "1" "February 11, 2020" "LOCAL" "General Commands Manual"
+.TH "cmark-gfm" "1" "March 24, 2016" "LOCAL" "General Commands Manual"
 .SH "NAME"
 \fBcmark\fR
-\- convert CommonMark formatted text to HTML
+\- convert CommonMark formatted text with GitHub Flavored Markdown extensions to HTML
 .SH "SYNOPSIS"
 .HP 6n
-\fBcmark\fR
+\fBcmark-gfm\fR
 [options]
 file*
 .SH "DESCRIPTION"
-\fBcmark\fR
+\fBcmark-gfm\fR
 converts Markdown formatted plain text to either HTML, groff man,
 CommonMark XML, LaTeX, or CommonMark, using the conventions
 described in the CommonMark spec.  It reads input from \fIstdin\fR
@@ -39,6 +39,15 @@ given with \-\-width.
 .B \-\-sourcepos
 Include source position attribute.
 .TP 12n
+.B \-\-normalize
+Consolidate adjacent text nodes.
+.TP 12n
+.B \-\-extension, \-e \f[I]EXTENSION_NAME\f[]
+Specify an extension name to use.
+.TP 12n
+.B \-\-list\-extensions
+List available extensions and quit.
+.TP 12n
 .B \-\-validate-utf8
 Validate UTF-8, replacing illegal sequences with U+FFFD.
 .TP 12n
@@ -49,17 +58,13 @@ be rendered as curly quotes, depending on their position.
 \f[C]\-\-\-\f[] will be rendered as an em-dash.
 \f[C]...\f[] will be rendered as ellipses.
 .TP 12n
-.B \-\-safe
-Omit raw HTML and potentially dangerous URLs (default).
-Raw HTML is replaced by a placeholder comment
-and potentially dangerous URLs are replaced by empty strings.
-Potentially dangerous URLs are those that begin with `javascript:`,
-`vbscript:`, `file:`, or `data:` (except for `image/png`,
-`image/gif`, `image/jpeg`, or `image/webp` mime types).
-.TP 12n
 .B \-\-unsafe
-Render raw HTML or potentially dangerous URLs, overriding
-the default (\-\-safe) behavior.
+Render raw HTML and potentially dangerous URLs.
+(Raw HTML is not replaced by a placeholder comment; potentially
+dangerous URLs are not replaced by empty strings.)  Dangerous
+URLs are those that begin with `javascript:`, `vbscript:`,
+`file:`, or `data:` (except for `image/png`, `image/gif`,
+`image/jpeg`, or `image/webp` mime types).
 .TP 12n
 .B \-\-help
 Print usage information.
@@ -70,4 +75,4 @@ Print version.
 John MacFarlane, Vicent Marti, Kārlis Gaņģis, Nick Wellnhofer.
 .SH "SEE ALSO"
 .PP
-CommonMark spec:  \f[C]https://spec.commonmark.org\f[].
+CommonMark spec:  \f[C]http://spec.commonmark.org\f[].

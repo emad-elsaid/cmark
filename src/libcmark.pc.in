@@ -1,10 +1,10 @@
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=@CMAKE_INSTALL_PREFIX@
-libdir=@CMAKE_INSTALL_FULL_LIBDIR@
-includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+libdir=@CMAKE_INSTALL_PREFIX@/@libdir@
+includedir=@CMAKE_INSTALL_PREFIX@/include
 
 Name: libcmark
-Description: CommonMark parsing, rendering, and manipulation
+Description: CommonMark parsing, rendering, and manipulation with GitHub Flavored Markdown extensions
 Version: @PROJECT_VERSION@
-Libs: -L${libdir} -lcmark
+Libs: -L${libdir} -lcmark-gfm -lcmark-gfm-extensions
 Cflags: -I${includedir}
